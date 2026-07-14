@@ -7,18 +7,19 @@ import { imageCommand } from './image.js';
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-// Check if keys exist
-console.log("GEMINI KEY LOADED:", !!process.env.GEMINI_KEY);
 console.log("BOT TOKEN LOADED:", !!process.env.BOT_TOKEN);
+console.log("GEMINI KEY LOADED:", !!process.env.GEMINI_KEY);
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-// Keep Render service awake
+// Keep Render alive
 http.createServer((req, res) => {
-  res.writeHead(200);
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
   res.end('ZYRO AI is alive');
-}).listen(3000);
+}).listen(3000, () => {
+  console.log('HTTP server running on port 3000');
+});
 
 client.once('ready', async () => {
   console.log(`ZYRO AI is online as ${client.user.tag}`);
@@ -44,6 +45,7 @@ client.once('ready', async () => {
   const rest = new REST({ version: '10' }).setToken(process.env.BOT_TOKEN);
   
   try {
+    console.log('Started refreshing application (/) commands.');
     await rest.put(Routes.applicationCommands(client.user.id), { body: commands });
     console.log('Successfully reloaded application (/) commands.');
   } catch (error) {
@@ -62,11 +64,12 @@ client.on('interactionCreate', async interaction => {
       await imageCommand(interaction, model);
     }
   } catch (error) {
-    console.error("COMMAND ERROR:", error);
+    console.error("COMMAND CRASH:", error);
+    const errorMsg = '❌ ZYRO crashed. Check Render logs.';
     if (interaction.deferred || interaction.replied) {
-      await interaction.editReply('❌ Something went wrong');
+      await interaction.editReply(errorMsg);
     } else {
-      await interaction.reply({ content: '❌ Something went wrong', ephemeral: true });
+      await interaction.reply({ content: errorMsg, ephemeral: true });
     }
   }
 });
