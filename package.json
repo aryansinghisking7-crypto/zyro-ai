@@ -1,0 +1,16 @@
+{
+  "name": "zyro-ai-bot",
+  "version": "1.0.0",
+  "description": "ZYRO AI Bot with slash commands",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.15.3",
+    "@google/generative-ai": "^0.15.0",
+    "axios": "^1.7.2",
+    "dotenv": "^16.4.5"
+  }
+}
